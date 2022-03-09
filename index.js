@@ -2,10 +2,60 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const {MongoClient} = require('mongodb');
+
+var http = require('http');
+var client;
+async function main(){
+  /**
+   * Connection URI. Update <username>, <password>, and <your-cluster-url> to reflect your cluster.
+   * See https://docs.mongodb.com/ecosystem/drivers/node/ for more details
+   */
+  
+  const uri = "mongodb+srv://test:test123@cluster0.zwqsf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+
+
+ client = new MongoClient(uri,{ useNewUrlParser: true });
+  try {
+      // Connect to the MongoDB cluster
+      await client.connect();
+      // Make the appropriate DB calls
+      await  listDatabases(client);
+
+      
+      await createListing(client);
+
+      //await createInvoice();
+      
+      
+  } catch (e) {
+      console.error('ee',e);
+  } finally {
+      await client.close();
+  }
+}
+
+async function listDatabases(client){
+  databasesList = await client.db().admin().listDatabases();
+
+  console.log("Databases:");
+  databasesList.databases.forEach(db => console.log(` - ${db.name}`));
+};
+
+async function createListing(client){
+  const newListing={
+    name: "Lovely Loft",
+    summary: "A charming loft in Paris",
+    bedrooms: 1,
+    bathrooms: 1
+  }
+  const result = await client.db("sample_airbnb").collection("listingsAndReviewssss").insertOne(newListing);
+  console.log(`New listing created with the following id: ${result.insertedId}`);
+}
 
 const app = express();
 const port = process.env.PORT || 3000;
-
+// https://events.hookdeck.com/e/src_oJCGWM6nopzyavufkrhTY4tZ
 
 
 // declare vars,
@@ -17,8 +67,9 @@ let text = "A NEW PRODUCT."
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: fromMail ,
-        pass: 'Subway@cakes123'
+        type: 'OAuth2',
+        user: 'subwaycakes@gmail.com',
+        accessToken: 'ya29.Xx_XX0xxxxx-xX0X0XxXXxXxXXXxX0x'
     }
 });
 
@@ -38,18 +89,20 @@ app.get('/', (req, res) => {
 });
 
 app.post('/send-email', (req, res) => {
-    let mailOptions = {
-        from: fromMail,
-        to: toMail,
-        subject: subject,
-        text: text
-    };
-    transporter.sendMail(mailOptions, (error, response) => {
-        if (error) {
-            console.log(error);
-        }
-        console.log(response)
-    });
+    main().catch(console.error);
+
+    // let mailOptions = {
+    //     from: fromMail,
+    //     to: toMail,
+    //     subject: subject,
+    //     text: text
+    // };
+    // transporter.sendMail(mailOptions, (error, response) => {
+    //     if (error) {
+    //         console.log(error);
+    //     }
+    //     console.log(response)
+    // });
     res.send('Email Send');
 });
 
