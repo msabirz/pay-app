@@ -63,8 +63,7 @@ app.route('/send-email').post(async (req, res) => {
     // main().catch(console.error);
     // const result = client.db("sample_airbnb").collection("updatedInvoice").insertOne(req.body);
     // console.log(`New listing created with the following id: ${result.insertedId}`);
-    res.status(200)
-    res.send('Email Send');
+    res.status(200).send('email SEND')
 });
 
 app.post('/payment-callback', (req, res) => {
