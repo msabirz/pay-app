@@ -51,14 +51,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
-app.get('/', req, res => {
+app.get('/', (req, res) => {
 
     
     res.send('Hello World, from express');
 });
 
 app.route('/send-email').post(async (req, res) => {
-    const result = await client.db("sample_airbnb").collection("updatedInvoice").insertOne(req.body);
+    const data = req.body
+    const result = await client.db("sample_airbnb").collection("updatedInvoice").insertOne(data);
     // main().catch(console.error);
     // const result = client.db("sample_airbnb").collection("updatedInvoice").insertOne(req.body);
     // console.log(`New listing created with the following id: ${result.insertedId}`);
