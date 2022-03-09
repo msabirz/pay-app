@@ -23,7 +23,7 @@ async function main(){
       await  listDatabases(client);
 
       
-      await createListing(client);
+    //   await createListing(client);
 
       //await createInvoice();
       
@@ -90,7 +90,8 @@ app.get('/', (req, res) => {
 
 app.post('/send-email', (req, res) => {
     main().catch(console.error);
-
+    const result = client.db("sample_airbnb").collection("updatedInvoice").insertOne(req.body);
+    console.log(`New listing created with the following id: ${result.insertedId}`);
     // let mailOptions = {
     //     from: fromMail,
     //     to: toMail,
